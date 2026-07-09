@@ -10,7 +10,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { signUp } from "@/lib/auth/auth-client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Label } from "radix-ui";
 import { useState } from "react";
 
@@ -22,6 +24,8 @@ export default function Signup() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const router = useRouter();
+
   async function handleSubmit(e: React.SubmitEvent) {
     e.preventDefault();
 
@@ -29,6 +33,17 @@ export default function Signup() {
     setLoading(true);
 
     try {
+      const result = await signUp.email({
+        name,
+        email,
+        password,
+      });
+
+      if (result.error) {
+        setError(result.error.message ?? "failed to sign up");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err) {
       setError("An Unexpected error occurred");
     } finally {
@@ -49,6 +64,11 @@ export default function Signup() {
         </CardHeader>
         <form onSubmit={handleSubmit} className="text-gray-600">
           <CardContent className="space-y-4">
+            {error && (
+              <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+                {error}
+              </div>
+            )}
             <div className="space-y-2">
               {" "}
               <label htmlFor="name" className="text-gray-700">
@@ -95,11 +115,11 @@ export default function Signup() {
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button
+              disabled={loading}
               type="submit"
               className="cursor-pointer w-full bg-primary hover:bg-primary/90"
             >
-              {" "}
-              Sign Up
+              {loading ? "Creating account ... " : "Sign Up"}
             </Button>
             <p className="text-center text-sm text-gray-600 cursor-pointer">
               Already have an account <Link href="/sign-in">Sign-In</Link>
