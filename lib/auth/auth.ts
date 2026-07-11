@@ -30,7 +30,7 @@ export async function signOut() {
 
   if (result.success) {
     redirect("/sign-in");
-  }
+  } 
 
-  
+
 }

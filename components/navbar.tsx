@@ -1,18 +1,20 @@
+"use client";
+
 import { Briefcase } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { getSession, signOut } from "@/lib/auth/auth";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { AvatarFallback } from "./ui/avatar";
+import SignOutButton from "./ui/sign-out-btn";
+import { useSession } from "@/lib/auth/auth-client";
 
-export default async function Navbar() {
-  const session = await getSession();
+export default function Navbar() {
+  const { data: session } = useSession();
 
   return (
     <nav className="border-b border-gray-200 bg-white">
@@ -50,10 +52,7 @@ export default async function Navbar() {
                       <p>{session.user.email}</p>
                     </div>
                   </DropdownMenuLabel>
-                  <DropdownMenuItem onClick={async () => await signOut()}>
-                    {" "}
-                    Log Out
-                  </DropdownMenuItem>
+                  <SignOutButton />
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
