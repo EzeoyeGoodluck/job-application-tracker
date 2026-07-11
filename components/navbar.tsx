@@ -9,7 +9,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { AvatarFallback } from "./ui/avatar";
+import { Avatar, AvatarFallback } from "./ui/avatar";
 import SignOutButton from "./ui/sign-out-btn";
 import { useSession } from "@/lib/auth/auth-client";
 
@@ -40,9 +40,11 @@ export default function Navbar() {
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Button variant="ghost">
-                    <AvatarFallback className="bg-primary">
-                      {session.user.name[0].toUpperCase()}
-                    </AvatarFallback>
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-primary">
+                        {session.user.name[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -61,14 +63,17 @@ export default function Navbar() {
               <Link href="/sign-up">
                 <Button
                   variant="ghost"
-                  className="text-gray-700 hover:bg-black"
+                  className="text-gray-700 hover:bg-primary hover:text-white"
                 >
                   Log In
                 </Button>
               </Link>
-              <Link href="/sign-in">
+              <Link href="/sign-up">
                 <Button className="bg-primary hover:bg-primary/90">
+                
+               
                   Start for free{" "}
+                
                 </Button>
               </Link>
             </>
