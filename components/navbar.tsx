@@ -70,10 +70,7 @@ export default function Navbar() {
               </Link>
               <Link href="/sign-up">
                 <Button className="bg-primary hover:bg-primary/90">
-                
-               
                   Start for free{" "}
-                
                 </Button>
               </Link>
             </>
