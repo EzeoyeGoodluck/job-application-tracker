@@ -44,10 +44,11 @@ export async function intializeUseerBoard(userId: string) {
       )
     );
 
-
     // Update the board with the column IDs
     board.columns = columns.map((col) => col._id);
     await board.save();
+
+    return board;
   } catch (err) {
     throw err;
   }

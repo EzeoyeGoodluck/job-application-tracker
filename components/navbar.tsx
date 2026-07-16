@@ -38,7 +38,7 @@ export default function Navbar() {
                 </Button>
               </Link>
               <DropdownMenu>
-                <DropdownMenuTrigger>
+                <DropdownMenuTrigger asChild>
                   <Button variant="ghost">
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="bg-primary">
