@@ -1,3 +1,4 @@
+import { KanbanBoard } from "@/components/kanban-board";
 import { getSession } from "@/lib/auth/auth";
 import connectDB from "@/lib/db";
 import { Board } from "@/lib/models";
@@ -17,7 +18,15 @@ export default async function Dashboard() {
     name: "Job Hunt",
   });
 
-  console.log(board);
-
-  return <div>Dashboard Page</div>;
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="container mx-auto p-6">
+        <div mb-6>
+          <h1 className="text-3xl font-bold text-black">{board.name}</h1>
+          <p className="text-gray-600">Tarck your job application</p>
+        </div>
+        <KanbanBoard board={board} userId={session.user.id} />
+      </div>
+    </div>
+  );
 }
