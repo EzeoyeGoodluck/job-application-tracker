@@ -1,5 +1,10 @@
 "use client";
 
-export default function KanbanBoard() {
+interface KanbanBoardProps {
+    board:  ;
+    userId: string;
+}
+
+export default function KanbanBoard({board, userId} : KanbanBoardProps) {
   return <div></div>;
 }
