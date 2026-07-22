@@ -39,12 +39,11 @@ export default function Home() {
         <ImageTabs />
 
         {/* Features Section */}
-        {/* Features Section */}
         <section className="border-t bg-white py-24">
           <div className="container mx-auto px-4">
             <div className="grid gap-12 md:grid-cols-3">
               <div className="flex flex-col">
-                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center">
+                <div className="mb-4 inline-flex h-12 w-12 rounded-lg items-center justify-center">
                   <Briefcase className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="mb-3 text-2xl font-semibold text-black">
@@ -57,7 +56,7 @@ export default function Home() {
               </div>
 
               <div className="flex flex-col">
-                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center">
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
                   <TrendingUp className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="mb-3 text-2xl font-semibold text-black">
