@@ -63,14 +63,14 @@ function DroppableColumn({
   boardId: string;
 }) {
   return (
-    <Card className="min-w-75 shrink-0 p-0 shadow-md">
+    <Card className="min-w-[300px] shrink-0 overflow-hidden p-0 shadow-md">
       <CardHeader
-        className={`${config.color} rounded-t-lg pb-3 pt-3 text-white`}
+        className={`${config.color} rounded-t-lg px-4 py-3 text-white`}
       >
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             {config.icon}
-            <CardTitle className=" text-white text-base font-semibold">
+            <CardTitle className="text-base font-semibold text-white">
               {column.name}
             </CardTitle>
           </div>
@@ -80,7 +80,7 @@ function DroppableColumn({
               <Button
                 variant="ghost"
                 size="icon"
-                className=" h-6 w-6 text-white hover:bg-white/20 hover:text-white/20"
+                className="h-8 w-8 text-white hover:bg-white/20 hover:text-white"
               >
                 <MoreVertical className="h-4 w-4" />
               </Button>
@@ -95,8 +95,12 @@ function DroppableColumn({
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className="space-y-2 pt-4 bg-gray-50/50 min-h-[400px] rounded-b-lg">
-        <CreateJobApplicatioinDialog columnId={column._id} boardId={boardId} />
+
+      <CardContent className="min-h-[400px] space-y-2 rounded-b-lg bg-gray-50/50 pt-4">
+        <CreateJobApplicatioinDialog
+          columnId={String(column._id)}
+          boardId={boardId}
+        />
       </CardContent>
     </Card>
   );
@@ -107,7 +111,7 @@ export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
 
   return (
     <div className="w-full overflow-x-auto">
-      <div className="flex gap-4 p-2   overflow-x-auto pb-4">
+      <div className="flex gap-4 overflow-x-auto p-2 pb-4">
         {columns.map((col, index) => {
           const config = COLUMN_CONFIG[index] || {
             color: "bg-gray-500",
@@ -116,10 +120,10 @@ export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
 
           return (
             <DroppableColumn
-              key={col._id}
+              key={String(col._id)}
               column={col}
               config={config}
-              boardId={board._id}
+              boardId={String(board._id)}
             />
           );
         })}
