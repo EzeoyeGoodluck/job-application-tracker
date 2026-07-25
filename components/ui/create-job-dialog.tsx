@@ -33,18 +33,14 @@ export default function CreateJobApplicatioinDialog({
     tags: "",
     description: "",
   });
+async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
+  e.preventDefault();
 
-  async function handleSubmit (e: React.FormEvent) {
-    e.preventDefault()
-
-    try {
-
-    } catch (err) {
-        console.error(err)
-
-    }
-
+  try {
+  } catch (err) {
+    console.error(err);
   }
+}
 
   return (
     <Dialog>
