@@ -12,35 +12,52 @@ import {
 import { Label } from "./label";
 import { Input } from "./input";
 import React, { useState } from "react";
+import { createJobApplications } from "@/lib/actions/job-applications";
 
 interface CreateJobApplicationDialogProps {
   columnId: string;
   boardId: string;
 }
 
+const INITIAL_FORM_DATA = {
+  company: "",
+  position: "",
+  location: "",
+  notes: "",
+  salary: "",
+  jobUrl: "",
+  tags: "",
+  description: "",
+};
+
 export default function CreateJobApplicatioinDialog({
   columnId,
   boardId,
 }: CreateJobApplicationDialogProps) {
   const [open, setOpen] = useState<boolean>(false);
-  const [FormData, setFormData] = useState({
-    company: "",
-    position: "",
-    location: "",
-    notes: "",
-    salary: "",
-    jobUrl: "",
-    tags: "",
-    description: "",
-  });
-async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
-  e.preventDefault();
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA);
+  async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
+    e.preventDefault();
 
-  try {
-  } catch (err) {
-    console.error(err);
+    try {
+      const result = await createJobApplications({
+        ...formData,
+        columnId,
+        boardId,
+        tags: formData.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0),
+      });
+
+      if (!result.error) {
+      } else {
+        console.log("failed to create job", result.error);
+      }
+    } catch (err) {
+      console.error(err);
+    }
   }
-}
 
   return (
     <Dialog>
@@ -67,9 +84,9 @@ async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
                   id="company"
                   required
                   onChange={(e) =>
-                    setFormData({ ...FormData, company: e.target.value })
+                    setFormData({ ...formData, company: e.target.value })
                   }
-                  value={FormData.company}
+                  value={formData.company}
                 />
               </div>
               <div className="space-y-4">
@@ -78,9 +95,9 @@ async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
                   id="position"
                   required
                   onChange={(e) =>
-                    setFormData({ ...FormData, position: e.target.value })
+                    setFormData({ ...formData, position: e.target.value })
                   }
-                  value={FormData.position}
+                  value={formData.position}
                 />
               </div>
             </div>
@@ -92,9 +109,9 @@ async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
                   id="location"
                   required
                   onChange={(e) =>
-                    setFormData({ ...FormData, location: e.target.value })
+                    setFormData({ ...formData, location: e.target.value })
                   }
-                  value={FormData.location}
+                  value={formData.location}
                 />
               </div>
               <div className="space-y-4">
@@ -103,9 +120,9 @@ async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
                   id="salary"
                   placeholder="e.g., $100k - $150k"
                   onChange={(e) =>
-                    setFormData({ ...FormData, salary: e.target.value })
+                    setFormData({ ...formData, salary: e.target.value })
                   }
-                  value={FormData.salary}
+                  value={formData.salary}
                 />
               </div>
             </div>
@@ -116,9 +133,9 @@ async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
                 id="jobUrl"
                 placeholder="https://..."
                 onChange={(e) =>
-                  setFormData({ ...FormData, jobUrl: e.target.value })
+                  setFormData({ ...formData, jobUrl: e.target.value })
                 }
-                value={FormData.jobUrl}
+                value={formData.jobUrl}
               />
             </div>
 
@@ -128,9 +145,9 @@ async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
                 id="description"
                 placeholder="Brief description of the role..."
                 onChange={(e) =>
-                  setFormData({ ...FormData, description: e.target.value })
+                  setFormData({ ...formData, description: e.target.value })
                 }
-                value={FormData.description}
+                value={formData.description}
               />
             </div>
 
@@ -139,9 +156,9 @@ async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
               <Input
                 id="notes"
                 onChange={(e) =>
-                  setFormData({ ...FormData, notes: e.target.value })
+                  setFormData({ ...formData, notes: e.target.value })
                 }
-                value={FormData.notes}
+                value={formData.notes}
               />
             </div>
           </div>
