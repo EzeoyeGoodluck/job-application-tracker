@@ -109,25 +109,30 @@ function DroppableColumn({
 export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
   const columns = board.columns;
 
-  return (
-    <div className="w-full overflow-x-auto">
-      <div className="flex gap-4 overflow-x-auto p-2 pb-4">
-        {columns.map((col, index) => {
-          const config = COLUMN_CONFIG[index] || {
-            color: "bg-gray-500",
-            icon: <Calendar className="h-4 w-4" />,
-          };
+  console.log(columns[0].jobApplication);
 
-          return (
-            <DroppableColumn
-              key={String(col._id)}
-              column={col}
-              config={config}
-              boardId={String(board._id)}
-            />
-          );
-        })}
+  return (
+    <>
+      {" "}
+      <div className="w-full overflow-x-auto">
+        <div className="flex gap-4 overflow-x-auto p-2 pb-4">
+          {columns.map((col, index) => {
+            const config = COLUMN_CONFIG[index] || {
+              color: "bg-gray-500",
+              icon: <Calendar className="h-4 w-4" />,
+            };
+
+            return (
+              <DroppableColumn
+                key={String(col._id)}
+                column={col}
+                config={config}
+                boardId={String(board._id)}
+              />
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
