@@ -51,7 +51,6 @@ export async function createJobApplications(data: JobApplicationData) {
   }
 
   //verify column belongs to board
-
   const column = await Column.findOne({
     _id: columnId,
     boardId: boardId,
@@ -75,6 +74,7 @@ export async function createJobApplications(data: JobApplicationData) {
     jobUrl,
     columnId,
     boardId,
+    userId: session.user.id,
     tags: tags || [],
     description,
     status: "applied",
@@ -86,6 +86,6 @@ export async function createJobApplications(data: JobApplicationData) {
   });
 
   return {
-    data: jobApplication,
+    data: JSON.parse(JSON.stringify(jobApplication)),
   };
 }
