@@ -13,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import { signUp } from "@/lib/auth/auth-client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Label } from "radix-ui";
 import { useState } from "react";
 
 export default function Signup() {
@@ -26,7 +25,7 @@ export default function Signup() {
 
   const router = useRouter();
 
-  async function handleSubmit(e: React.SubmitEvent) {
+  async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
 
     setError("");
@@ -40,12 +39,13 @@ export default function Signup() {
       });
 
       if (result.error) {
-        setError(result.error.message ?? "failed to sign up");
+        setError(result.error.message ?? "Failed to sign up");
       } else {
         router.push("/dashboard");
       }
     } catch (err) {
-      setError("An Unexpected error occurred");
+      console.error(err);
+      setError("An unexpected error occurred");
     } finally {
       setLoading(false);
     }
@@ -53,7 +53,7 @@ export default function Signup() {
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-white p-4">
-      <Card className="w-full max-w-md border-gray-200  shadow-lg">
+      <Card className="w-full max-w-md border-gray-200 shadow-lg">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-black">
             Sign Up
@@ -62,6 +62,7 @@ export default function Signup() {
             Create an account to start tracking your job applications
           </CardDescription>
         </CardHeader>
+
         <form onSubmit={handleSubmit} className="text-gray-600">
           <CardContent className="space-y-4">
             {error && (
@@ -69,60 +70,64 @@ export default function Signup() {
                 {error}
               </div>
             )}
+
             <div className="space-y-2">
-              {" "}
               <label htmlFor="name" className="text-gray-700">
                 Name
               </label>
               <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
                 id="name"
                 type="text"
-                placeholder="john Doe "
+                placeholder="John Doe"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 required
               />
             </div>
 
-            <div>
-              {" "}
-              <label htmlFor="email">Email</label>
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-gray-700">
+                Email
+              </label>
               <Input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 id="email"
                 type="email"
                 placeholder="john@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 className="border-gray-300 focus:border-primary focus:ring-primary"
               />
             </div>
 
-            <div>
-              {" "}
-              <label htmlFor="password">Password</label>
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-gray-700">
+                Password
+              </label>
               <Input
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 id="password"
                 type="password"
-                placeholder="john Doe "
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 minLength={8}
                 required
                 className="border-gray-300 focus:border-primary focus:ring-primary"
               />
             </div>
           </CardContent>
+
           <CardFooter className="flex flex-col space-y-4">
             <Button
-              disabled={loading}
               type="submit"
-              className="cursor-pointer w-full bg-primary hover:bg-primary/90"
+              disabled={loading}
+              className="w-full cursor-pointer bg-primary hover:bg-primary/90"
             >
-              {loading ? "Creating account ... " : "Sign Up"}
+              {loading ? "Creating account..." : "Sign Up"}
             </Button>
-            <p className="text-center text-sm text-gray-600 cursor-pointer">
-              Already have an account <Link href="/sign-in">Sign-In</Link>
+
+            <p className="cursor-pointer text-center text-sm text-gray-600">
+              Already have an account? <Link href="/sign-in">Sign in</Link>
             </p>
           </CardFooter>
         </form>
