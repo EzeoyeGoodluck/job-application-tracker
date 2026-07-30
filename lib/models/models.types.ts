@@ -10,17 +10,18 @@ export interface JobApplication {
   order: number;
   tags?: string[];
   description?: string;
+  columnId?: string;
+  boardId?: string;
 }
-
 export interface Column {
   _id: string;
   name: string;
   order: number;
-  jobapplication: JobApplication[];
+  jobApplications: JobApplication[];
 }
 
 export interface Board {
   _id: string;
   name: string;
-  columns: Column[];
+  column: Column[];
 }
