@@ -126,7 +126,9 @@ function SortableJobCard({
   job: JobApplication;
   columns: Column[];
 }) {
-  return <div></div>;
+  return <div>
+    <JobApplicationCard  />
+  </div>;
 }
 
 export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
