@@ -19,6 +19,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
 import CreateJobApplicatioinDialog from "./ui/create-job-dialog";
+import JobApplicationCard from "./job-application-card";
 
 interface KanbanBoardProps {
   board: Board;
@@ -126,9 +127,11 @@ function SortableJobCard({
   job: JobApplication;
   columns: Column[];
 }) {
-  return <div>
-    <JobApplicationCard  />
-  </div>;
+  return (
+    <div>
+      <JobApplicationCard job={job} columns={columns} />
+    </div>
+  );
 }
 
 export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
