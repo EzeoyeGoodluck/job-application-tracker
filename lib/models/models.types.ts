@@ -23,5 +23,5 @@ export interface Column {
 export interface Board {
   _id: string;
   name: string;
-  column: Column[];
+  columns: Column[];
 }

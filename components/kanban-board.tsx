@@ -135,7 +135,8 @@ function SortableJobCard({
 }
 
 export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
-  const columns = board.column;
+  const columns = board.columns;
+  console.log(board);
 
   const sortedColumns = columns?.sort((a, b) => a.order - b.order) || [];
 
@@ -144,8 +145,8 @@ export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
       {" "}
       <div className="w-full overflow-x-auto">
         <div className="flex gap-4 overflow-x-auto p-2 pb-4">
-          {columns.map((col, index) => {
-            const config = COLUMN_CONFIG[index] || {
+          {columns.map((col, key) => {
+            const config = COLUMN_CONFIG[key] || {
               color: "bg-gray-500",
               icon: <Calendar className="h-4 w-4" />,
             };
