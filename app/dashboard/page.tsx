@@ -25,7 +25,7 @@ export default async function Dashboard() {
     })
     .lean();
 
-  // console.log("Dashboard board before passing:", board);
+  console.log("Dashboard board before passing:", board);
 
   return (
     <div className="min-h-screen bg-white">

@@ -40,7 +40,7 @@ export async function createJobApplications(data: JobApplicationData) {
     return { error: "Missing required fields" };
   }
 
-  //Verify board ownership
+  // Verify board ownership
   const board = await Board.findOne({
     _id: boardId,
     userId: session.user.id,
@@ -50,7 +50,7 @@ export async function createJobApplications(data: JobApplicationData) {
     return { error: "Board not found" };
   }
 
-  //verify column belongs to board
+  // Verify column belongs to board
   const column = await Column.findOne({
     _id: columnId,
     boardId: boardId,
@@ -81,8 +81,9 @@ export async function createJobApplications(data: JobApplicationData) {
     order: maxOrder ? maxOrder.order + 1 : 0,
   });
 
+  // CRITICAL FIX: push into jobApplications (plural)
   await Column.findByIdAndUpdate(columnId, {
-    $push: { jobApplication: jobApplication._id },
+    $push: { jobApplications: jobApplication._id },
   });
 
   return {

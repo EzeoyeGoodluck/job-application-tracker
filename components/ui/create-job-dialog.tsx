@@ -1,4 +1,9 @@
+"use client";
+
+import React, { useState } from "react";
 import { Plus } from "lucide-react";
+import { createJobApplications } from "@/lib/actions/job-applications";
+
 import { Button } from "./button";
 import {
   Dialog,
@@ -11,8 +16,6 @@ import {
 } from "./dialog";
 import { Label } from "./label";
 import { Input } from "./input";
-import React, { useState } from "react";
-import { createJobApplications } from "@/lib/actions/job-applications";
 
 interface CreateJobApplicationDialogProps {
   columnId: string;
@@ -36,8 +39,11 @@ export default function CreateJobApplicatioinDialog({
 }: CreateJobApplicationDialogProps) {
   const [open, setOpen] = useState<boolean>(false);
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
+  const [submitting, setSubmitting] = useState(false);
+
   async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
+    setSubmitting(true);
 
     try {
       const result = await createJobApplications({
@@ -50,17 +56,24 @@ export default function CreateJobApplicatioinDialog({
           .filter((tag) => tag.length > 0),
       });
 
-      if (!result.error) {
+      console.log("createJobApplications result:", result);
+
+      if (!result?.error) {
+        // Success: reset form and close dialog
+        setFormData(INITIAL_FORM_DATA);
+        setOpen(false);
       } else {
-        console.log("failed to create job", result.error);
+        console.log("Failed to create job", result.error);
       }
     } catch (err) {
-      console.error(err);
+      console.error("createJobApplications threw:", err);
+    } finally {
+      setSubmitting(false);
     }
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
           variant="outline"
@@ -70,11 +83,13 @@ export default function CreateJobApplicatioinDialog({
           Add Job
         </Button>
       </DialogTrigger>
+
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle> Add Job Application</DialogTitle>
+          <DialogTitle>Add Job Application</DialogTitle>
           <DialogDescription>Track a new job application</DialogDescription>
         </DialogHeader>
+
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -89,7 +104,8 @@ export default function CreateJobApplicatioinDialog({
                   value={formData.company}
                 />
               </div>
-              <div className="space-y-4">
+
+              <div className="space-y-2">
                 <Label htmlFor="position">Position</Label>
                 <Input
                   id="position"
@@ -103,8 +119,8 @@ export default function CreateJobApplicatioinDialog({
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-4">
-                <Label htmlFor="loaction">Location</Label>
+              <div className="space-y-2">
+                <Label htmlFor="location">Location</Label>
                 <Input
                   id="location"
                   required
@@ -114,7 +130,8 @@ export default function CreateJobApplicatioinDialog({
                   value={formData.location}
                 />
               </div>
-              <div className="space-y-4">
+
+              <div className="space-y-2">
                 <Label htmlFor="salary">Salary</Label>
                 <Input
                   id="salary"
@@ -127,7 +144,7 @@ export default function CreateJobApplicatioinDialog({
               </div>
             </div>
 
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="jobUrl">Job URL</Label>
               <Input
                 id="jobUrl"
@@ -139,8 +156,8 @@ export default function CreateJobApplicatioinDialog({
               />
             </div>
 
-            <div>
-              <Label htmlFor="description"> Description </Label>
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
               <Input
                 id="description"
                 placeholder="Brief description of the role..."
@@ -151,8 +168,8 @@ export default function CreateJobApplicatioinDialog({
               />
             </div>
 
-            <div>
-              <Label htmlFor="notes"> Notes </Label>
+            <div className="space-y-2">
+              <Label htmlFor="notes">Notes</Label>
               <Input
                 id="notes"
                 onChange={(e) =>
@@ -161,13 +178,35 @@ export default function CreateJobApplicatioinDialog({
                 value={formData.notes}
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tags">Tags (comma separated)</Label>
+              <Input
+                id="tags"
+                placeholder="remote, senior, frontend"
+                onChange={(e) =>
+                  setFormData({ ...formData, tags: e.target.value })
+                }
+                value={formData.tags}
+              />
+            </div>
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setFormData(INITIAL_FORM_DATA);
+                setOpen(false);
+              }}
+            >
               Cancel
             </Button>
-            <Button type="submit"> Add Application</Button>
+
+            <Button type="submit" disabled={submitting}>
+              {submitting ? "Adding..." : "Add Application"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
