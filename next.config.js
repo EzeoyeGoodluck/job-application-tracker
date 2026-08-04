@@ -1,8 +1,10 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    useCache: true,
+  },
   turbopack: {
     root: __dirname,
-    cachCompnents:true,
+    cacheComponents: true,
   },
 };
 
