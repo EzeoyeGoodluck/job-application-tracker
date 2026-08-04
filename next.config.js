@@ -2,6 +2,7 @@
 const nextConfig = {
   turbopack: {
     root: __dirname,
+    cachCompnents:true,
   },
 };
 

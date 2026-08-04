@@ -2,19 +2,15 @@ import KanbanBoard from "@/components/kanban-board";
 import { getSession } from "@/lib/auth/auth";
 import connectDB from "@/lib/db";
 import { Board } from "@/lib/models";
+import board from "@/lib/models/board";
 import { redirect } from "next/navigation";
 
-export default async function Dashboard() {
-  const session = await getSession();
-
-  if (!session?.user) {
-    redirect("/sign-in");
-  }
-
+async function getBoard(userId: string) {
+  "use cache";
   await connectDB();
 
   const board = await Board.findOne({
-    userId: session.user.id,
+    userId: userId,
     name: "Job Hunt",
   })
     .populate({
@@ -25,7 +21,16 @@ export default async function Dashboard() {
     })
     .lean();
 
-  console.log("Dashboard board before passing:", board);
+  return board;
+}
+
+export default async function Dashboard() {
+  const session = await getSession();
+  const board = await getBoard(session?.user.id ?? "");
+
+  if (!session?.user) {
+    redirect("/sign-in");
+  }
 
   return (
     <div className="min-h-screen bg-white">
