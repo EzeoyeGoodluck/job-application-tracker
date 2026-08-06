@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getSession } from "../auth/auth";
 import { Board, Column, JobApplication } from "../models";
+import column from "../models/column";
 
 interface JobApplicationData {
   company: string;
@@ -92,4 +93,68 @@ export async function createJobApplications(data: JobApplicationData) {
   return {
     data: JSON.parse(JSON.stringify(jobApplication)),
   };
+}
+
+export async function updateJobApplication(
+  id: string,
+  updates: {
+    company?: string;
+    position?: string;
+    location?: string;
+    notes?: string;
+    salary?: string;
+    jobUrl?: string;
+    columnId?: string;
+    order?: number;
+    tags?: string[];
+    description?: string;
+  }
+) {
+  const session = await getSession();
+
+  if (!session?.user) {
+    return { error: "Unathorized" };
+  }
+
+  const jobApplication = await JobApplication.findById(id);
+
+  if (!jobApplication) {
+    return { error: "job application not found" };
+  }
+
+  if (jobApplication.userId !== session.user.id) {
+    return { error: "unAuthorized" };
+  }
+
+  const { columnId, order, ...otherUpdates } = updates;
+
+  const updatesToApply: Partial<{
+    company?: string;
+    position?: string;
+    location?: string;
+    notes?: string;
+    salary?: string;
+    jobUrl?: string;
+    columnId?: string;
+    order?: number;
+    tags?: string[];
+    description?: string;
+  }> = otherUpdates;
+
+  const currentColumnId = jobApplication.columnId.toString();
+  const newColumnId = columnId?.toString();
+
+  const isMovingToDifferentColumn =
+    newColumnId && newColumnId !== currentColumnId;
+
+  if (!isMovingToDifferentColumn) {
+    await Column.findByIdAndUpdate(currentColumnId, {
+      $pull: { jobApplication: id },
+    });
+
+    const jobInTargetColumn = await JobApplication.find({
+    columnId: newColumnId,
+    _id: {}
+    });
+  }
 }
