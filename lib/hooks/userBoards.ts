@@ -18,10 +18,8 @@ export function useBoard(initialBoard?: Board | null) {
 
   return {
     board,
-    setBoard,
     columns,
-    setColumns,
     error,
-    setError,
+    moveJobs,
   };
 }
