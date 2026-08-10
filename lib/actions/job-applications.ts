@@ -198,7 +198,7 @@ export async function updateJobApplication(
     const currentPositionIndex = otherJobsInColumn.findIndex(
       (job) => job.order > currentJobOrder
     );
-    
+
     const oldPositionindex =
       currentPositionIndex === -1
         ? otherJobsInColumn.length
