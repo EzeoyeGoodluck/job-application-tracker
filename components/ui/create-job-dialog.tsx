@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Plus } from "lucide-react";
-import { createJobApplications } from "@/lib/actions/job-applications";
+import { createJobApplication } from "@/lib/actions/job-applications";
 
 import { Button } from "./button";
 import {
@@ -46,7 +46,7 @@ export default function CreateJobApplicatioinDialog({
     setSubmitting(true);
 
     try {
-      const result = await createJobApplications({
+      const result = await createJobApplication({
         ...formData,
         columnId,
         boardId,
