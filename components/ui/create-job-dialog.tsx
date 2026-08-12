@@ -46,7 +46,7 @@ export default function CreateJobApplicatioinDialog({
     setSubmitting(true);
 
     try {
-      const result = await createJobApplication({
+      const result = await createJobApplications({
         ...formData,
         columnId,
         boardId,
