@@ -11,6 +11,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
 import {
+  deleteJobApplication,
   // deleteJobApplication,
   updateJobApplication,
 } from "@/lib/actions/job-applications";
@@ -25,7 +26,7 @@ import {
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
-import React, { useState,  SubmitEventHandler } from "react";
+import React, { useState, SubmitEventHandler } from "react";
 interface JobApplicationCardProps {
   job: JobApplication;
   columns: Column[];
@@ -50,8 +51,7 @@ export default function JobApplicationCard({
     description: job.description || "",
   });
 
-   const handleUpdate: SubmitEventHandler<HTMLFormElement> = async (e) => {
-
+  const handleUpdate: SubmitEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     try {
       const result = await updateJobApplication(job._id, {
@@ -68,17 +68,17 @@ export default function JobApplicationCard({
     } catch (err) {
       console.error("Failed to move job application: ", err);
     }
-  }
+  };
 
   async function handleDelete() {
-    // try {
-    //   const result = await deleteJobApplication(job._id);
-    //   if (result.error) {
-    //     console.error("Failed to delete job application:", result.error);
-    //   }
-    // } catch (err) {
-    //   console.error("Failed to move job application: ", err);
-    // }
+    try {
+      const result = await deleteJobApplication(job._id);
+      if (result.error) {
+        console.error("Failed to delete job application:", result.error);
+      }
+    } catch (err) {
+      console.error("Failed to move job application: ", err);
+    }
   }
 
   async function handleMove(newColumnId: string) {
