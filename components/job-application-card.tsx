@@ -25,7 +25,7 @@ import {
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
-import React, { useState } from "react";
+import React, { useState,  SubmitEventHandler } from "react";
 interface JobApplicationCardProps {
   job: JobApplication;
   columns: Column[];
@@ -50,7 +50,8 @@ export default function JobApplicationCard({
     description: job.description || "",
   });
 
-  async function handleUpdate(e: React.FormEvent) {
+   const handleUpdate: SubmitEventHandler<HTMLFormElement> = async (e) => {
+
     e.preventDefault();
     try {
       const result = await updateJobApplication(job._id, {
@@ -72,7 +73,6 @@ export default function JobApplicationCard({
   async function handleDelete() {
     // try {
     //   const result = await deleteJobApplication(job._id);
-
     //   if (result.error) {
     //     console.error("Failed to delete job application:", result.error);
     //   }
