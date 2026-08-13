@@ -254,13 +254,12 @@ export async function deleteJobApplication(id: string) {
     return { error: "Unauthorized" };
   }
 
-  await Column.findByIdAndUpdate(jobApplication.ColumnId, { $pull : { jobApplication: id },
-
+  await Column.findByIdAndUpdate(jobApplication.ColumnId, {
+    $pull: { jobApplication: id },
   });
 
   await JobApplication.deleteOne({ _id: id });
   revalidatePath("/dashboard");
 
-  return { success: true};
-
+  return { success: true };
 }

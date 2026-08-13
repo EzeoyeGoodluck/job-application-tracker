@@ -12,7 +12,6 @@ import {
 import { Button } from "./ui/button";
 import {
   deleteJobApplication,
-  // deleteJobApplication,
   updateJobApplication,
 } from "@/lib/actions/job-applications";
 import {
