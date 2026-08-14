@@ -24,6 +24,8 @@ import { UserBoard } from "@/lib/hooks/userBoards";
 import {
   closestCorners,
   DndContext,
+  DragEndEvent,
+  DragStartEvent,
   PointerSensor,
   useDroppable,
   useSensor,
@@ -35,6 +37,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useState } from "react";
 
 interface KanbanBoardProps {
   board: Board;
@@ -183,8 +186,9 @@ function SortableJobCard({
 }
 
 export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
+  const [activeId, setActiveId] = useState<string | null>(null) 
+  
   const { columns, moveJobs } = UserBoard(board);
-
   const sortedColumns = [...columns].sort((a, b) => a.order - b.order);
 
   const sensors = useSensors(
@@ -194,10 +198,39 @@ export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
       },
     })
   );
-  async function handleDragStart() {}
 
-  async function handleDragEnd() {}
+  async function handleDragStart(event: DragStartEvent) {
+    setActiveId(event.active.id as string)
+  }
 
+  async function handleDragEnd(event: DragEndEvent) {
+    const {active, over} = event
+
+    setActiveId(null);
+
+    if (!over || !board._id) return;
+
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    let draggedJob: JobApplication | null = null;
+    let sourceColumn:  Column | null = null; 
+    let sourceIndex = -1;
+
+    for (const column of sortedColumns) {
+      const jobs = column.jobApplications.sort((a,b) => a.order - b.order) || [];
+      const jobIndex = jobs.findIndex((j) => j._id === activeId);
+
+      if(jobIndex !== -1){
+        draggedJob = jobs[jobIndex];
+        sourceColumn = column;
+        sourceIndex = jobIndex;
+        break;
+      }
+    }
+
+    if()
+  }
   return (
     <DndContext
       sensors={sensors}
