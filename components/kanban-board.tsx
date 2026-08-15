@@ -38,6 +38,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
+import { string } from "better-auth";
 
 interface KanbanBoardProps {
   board: Board;
@@ -229,8 +230,57 @@ export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
       }
     }
 
-    if()
+    if(!draggedJob || sourceColumn) return;
+
+    //Check if dragged in a column or another job
+    const targetColumn = sortedColumns.find((col) => col._id === overId);
+    const targetJob = sortedColumns.flatMap((col) => col.jobApplications || []).find((job) => job._id === overId);
+
+    let targetColumnId: string
+    let newOrder: number;
+
+    if(targetColumn) {
+      targetColumnId = targetColumn._id;
+      const jobInTarget = targetColumn.jobApplications.filter((j) => j._id !== activeId)
+      .sort((a,b) => a.order - b.order) || [];
+      newOrder = jobInTarget.length;
+    } else if (targetJob) {
+      const  targetJobColumn = sortedColumns.find((col) => col.jobApplications.some((j) => j._id === targetJob._id)
+    );
+    targetColumnId = targetJob.columnId || targetJobColumn?._id || ""; 
+    if(!targetColumnId) return;
+
+    const targetColumnObj = sortedColumns.find((col) => col._id === targetColumnId
+  );
+  
+  if(!targetColumnObj) return;
+
+  const allJobsInTargetOriginal = targetColumnObj.jobApplications.sort((a,b) => a.order - b.order) || [];
+
+  const  allJobsInTargetFiltered = allJobsInTargetOriginal.filter((j) => j._id !== activeId) || [];
+     
+    const targetIndexInOriginal = allJobsInTargetOriginal.findIndex(
+      (j) => j._id === overId
+    );
+
+     const targetIndexInFiltered = allJobsInTargetFiltered.findIndex(
+      (j) => j._id === overId
+    );
+if ( targetIndexInFiltered !== -1){
+  if (sourceColumn._id === targetColumnId){
+    if(sourceIndex < targetIndexInOriginal) {
+      newOrder = targetIndexInFiltered + 1;
+    } else {
+      newOrder = targetIndexInFiltered;
+    }
+  } esle {
+    newOrder = allJobsInTargetFiltered.length;
   }
+}
+
+    }
+  }
+
   return (
     <DndContext
       sensors={sensors}
