@@ -230,56 +230,78 @@ export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
       }
     }
 
-    if(!draggedJob || sourceColumn) return;
+    if (!draggedJob || sourceColumn) return;
 
     //Check if dragged in a column or another job
-    const targetColumn = sortedColumns.find((col) => col._id === overId);
-    const targetJob = sortedColumns.flatMap((col) => col.jobApplications || []).find((job) => job._id === overId);
+       const targetColumn = sortedColumns.find((col) => col._id === overId);
+    const targetJob = sortedColumns
+      .flatMap((col) => col.jobApplications || [])
+      .find((job) => job._id === overId);
 
-    let targetColumnId: string
+    let targetColumnId: string;
     let newOrder: number;
 
-    if(targetColumn) {
+    if (targetColumn) {
       targetColumnId = targetColumn._id;
-      const jobInTarget = targetColumn.jobApplications.filter((j) => j._id !== activeId)
-      .sort((a,b) => a.order - b.order) || [];
-      newOrder = jobInTarget.length;
+      const jobsInTarget =
+        targetColumn.jobApplications
+          .filter((j) => j._id !== activeId)
+          .sort((a, b) => a.order - b.order) || [];
+      newOrder = jobsInTarget.length;
     } else if (targetJob) {
-      const  targetJobColumn = sortedColumns.find((col) => col.jobApplications.some((j) => j._id === targetJob._id)
-    );
-    targetColumnId = targetJob.columnId || targetJobColumn?._id || ""; 
-    if(!targetColumnId) return;
+      const targetJobColumn = sortedColumns.find((col) =>
+        col.jobApplications.some((j) => j._id === targetJob._id)
+      );
+      targetColumnId = targetJob.columnId || targetJobColumn?._id || "";
+      if (!targetColumnId) return;
 
-    const targetColumnObj = sortedColumns.find((col) => col._id === targetColumnId
-  );
-  
-  if(!targetColumnObj) return;
+      const targetColumnObj = sortedColumns.find(
+        (col) => col._id === targetColumnId
+      );
 
-  const allJobsInTargetOriginal = targetColumnObj.jobApplications.sort((a,b) => a.order - b.order) || [];
+      if (!targetColumnObj) return;
 
-  const  allJobsInTargetFiltered = allJobsInTargetOriginal.filter((j) => j._id !== activeId) || [];
-     
-    const targetIndexInOriginal = allJobsInTargetOriginal.findIndex(
-      (j) => j._id === overId
-    );
+      const allJobsInTargetOriginal =
+        targetColumnObj.jobApplications.sort((a, b) => a.order - b.order) || [];
 
-     const targetIndexInFiltered = allJobsInTargetFiltered.findIndex(
-      (j) => j._id === overId
-    );
-if ( targetIndexInFiltered !== -1){
-  if (sourceColumn._id === targetColumnId){
-    if(sourceIndex < targetIndexInOriginal) {
-      newOrder = targetIndexInFiltered + 1;
+      const allJobsInTargetFiltered =
+        allJobsInTargetOriginal.filter((j) => j._id !== activeId) || [];
+
+      const targetIndexInOriginal = allJobsInTargetOriginal.findIndex(
+        (j) => j._id === overId
+      );
+
+      const targetIndexInFiltered = allJobsInTargetFiltered.findIndex(
+        (j) => j._id === overId
+      );
+
+      if (targetIndexInFiltered !== -1) {
+        if (sourceColumn._id === targetColumnId) {
+          if (sourceIndex < targetIndexInOriginal) {
+            newOrder = targetIndexInFiltered + 1;
+          } else {
+            newOrder = targetIndexInFiltered;
+          }
+        } else {
+          newOrder = targetIndexInFiltered;
+        }
+      } else {
+        newOrder = allJobsInTargetFiltered.length;
+      }
     } else {
-      newOrder = targetIndexInFiltered;
+      return;
     }
-  } esle {
-    newOrder = allJobsInTargetFiltered.length;
-  }
-}
 
+    if (!targetColumnId) {
+      return;
     }
+
+    await moveJobs(activeId, targetColumnId, newOrder);
   }
+
+  const activeJob = sortedColumns
+    .flatMap((col) => col.jobApplications || [])
+    .find((job) => job._id === activeId);
 
   return (
     <DndContext
