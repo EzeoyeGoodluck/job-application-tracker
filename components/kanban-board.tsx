@@ -163,7 +163,14 @@ function SortableJobCard({
   job: JobApplication;
   columns: Column[];
 }) {
-  const { attributes, listeners, transform , transition, isDragging, setNodeRef} = useSortable ({
+  const {
+    attributes,
+    listeners,
+    transform,
+    transition,
+    isDragging,
+    setNodeRef,
+  } = useSortable({
     id: job._id,
     data: {
       type: "job",
@@ -171,24 +178,26 @@ function SortableJobCard({
     },
   });
 
-
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-
-  }
+  };
 
   return (
-    <div ref={setNodeRef}  style={style} >
-      <JobApplicationCard job={job} columns={columns}  dragHandleProps={{...attributes, ...listeners}} />
+    <div ref={setNodeRef} style={style}>
+      <JobApplicationCard
+        job={job}
+        columns={columns}
+        dragHandleProps={{ ...attributes, ...listeners }}
+      />
     </div>
   );
 }
 
 export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
-  const [activeId, setActiveId] = useState<string | null>(null) 
-  
+  const [activeId, setActiveId] = useState<string | null>(null);
+
   const { columns, moveJobs } = UserBoard(board);
   const sortedColumns = [...columns].sort((a, b) => a.order - b.order);
 
@@ -201,11 +210,11 @@ export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
   );
 
   async function handleDragStart(event: DragStartEvent) {
-    setActiveId(event.active.id as string)
+    setActiveId(event.active.id as string);
   }
 
   async function handleDragEnd(event: DragEndEvent) {
-    const {active, over} = event
+    const { active, over } = event;
 
     setActiveId(null);
 
@@ -215,14 +224,15 @@ export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
     const overId = over.id as string;
 
     let draggedJob: JobApplication | null = null;
-    let sourceColumn:  Column | null = null; 
+    let sourceColumn: Column | null = null;
     let sourceIndex = -1;
 
     for (const column of sortedColumns) {
-      const jobs = column.jobApplications.sort((a,b) => a.order - b.order) || [];
+      const jobs =
+        column.jobApplications.sort((a, b) => a.order - b.order) || [];
       const jobIndex = jobs.findIndex((j) => j._id === activeId);
 
-      if(jobIndex !== -1){
+      if (jobIndex !== -1) {
         draggedJob = jobs[jobIndex];
         sourceColumn = column;
         sourceIndex = jobIndex;
@@ -230,10 +240,10 @@ export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
       }
     }
 
-    if (!draggedJob || sourceColumn) return;
+    if (!draggedJob || !sourceColumn) return;
 
     //Check if dragged in a column or another job
-       const targetColumn = sortedColumns.find((col) => col._id === overId);
+    const targetColumn = sortedColumns.find((col) => col._id === overId);
     const targetJob = sortedColumns
       .flatMap((col) => col.jobApplications || [])
       .find((job) => job._id === overId);
