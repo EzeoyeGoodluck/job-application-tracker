@@ -6,6 +6,7 @@ import {
   Calendar,
   CheckCircle2,
   Mic,
+  MoreHorizontal,
   MoreVertical,
   Trash2,
   XCircle,
@@ -18,13 +19,14 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
-import CreateJobApplicatioinDialog from "./ui/create-job-dialog";
+import CreateJobApplicationDialog from "./create-job-dialog";
 import JobApplicationCard from "./job-application-card";
-import { UserBoard } from "@/lib/hooks/userBoards";
+import { useBoard } from "@/lib/hooks/useBoards";
 import {
   closestCorners,
   DndContext,
   DragEndEvent,
+  DragOverlay,
   DragStartEvent,
   PointerSensor,
   useDroppable,
@@ -38,7 +40,6 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
-import { string } from "better-auth";
 
 interface KanbanBoardProps {
   board: Board;
@@ -49,8 +50,7 @@ interface ColConfig {
   color: string;
   icon: React.ReactNode;
 }
-
-const COLUMN_CONFIG: ColConfig[] = [
+const COLUMN_CONFIG: Array<ColConfig> = [
   {
     color: "bg-cyan-500",
     icon: <Calendar className="h-4 w-4" />,
@@ -92,36 +92,32 @@ function DroppableColumn({
     },
   });
 
-  const sortedJobs = [...(column.jobApplications ?? [])].sort(
-    (a, b) => a.order - b.order
-  );
-
+  const sortedJobs =
+    column.jobApplications?.sort((a, b) => a.order - b.order) || [];
   return (
-    <Card className="min-w-[300px] shrink-0 overflow-hidden p-0 shadow-md">
+    <Card className="min-w-[300px] flex-shrink-0 shadow-md p-0">
       <CardHeader
-        className={`${config.color} rounded-t-lg px-4 py-3 text-white`}
+        className={`${config.color} text-white rounded-t-lg pb-3 pt-3`}
       >
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {config.icon}
-            <CardTitle className="text-base font-semibold text-white">
+            <CardTitle className="text-white text-base font-semibold">
               {column.name}
             </CardTitle>
           </div>
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-white hover:bg-white/20 hover:text-white"
+                className="h-6 w-6 text-white hover:bg-white/20"
               >
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-
             <DropdownMenuContent align="end">
-              <DropdownMenuItem className="text-red-600 focus:text-red-600">
+              <DropdownMenuItem className="text-destructive">
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete Column
               </DropdownMenuItem>
@@ -132,7 +128,9 @@ function DroppableColumn({
 
       <CardContent
         ref={setNodeRef}
-        className={`min-h-[400px] space-y-2 rounded-b-lg bg-gray-50/50 pt-4 ${isOver ? "ring-2 ring-blue-500" : ""} `}
+        className={`space-y-2 pt-4 bg-gray-50/50 min-h-[400px] rounded-b-lg ${
+          isOver ? "ring-2 ring-blue-500" : ""
+        }`}
       >
         <SortableContext
           items={sortedJobs.map((job) => job._id)}
@@ -147,10 +145,7 @@ function DroppableColumn({
           ))}
         </SortableContext>
 
-        <CreateJobApplicatioinDialog
-          columnId={String(column._id)}
-          boardId={boardId}
-        />
+        <CreateJobApplicationDialog columnId={column._id} boardId={boardId} />
       </CardContent>
     </Card>
   );
@@ -183,7 +178,6 @@ function SortableJobCard({
     transition,
     opacity: isDragging ? 0.5 : 1,
   };
-
   return (
     <div ref={setNodeRef} style={style}>
       <JobApplicationCard
@@ -197,9 +191,9 @@ function SortableJobCard({
 
 export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const { columns, moveJob } = useBoard(board);
 
-  const { columns, moveJobs } = UserBoard(board);
-  const sortedColumns = [...columns].sort((a, b) => a.order - b.order);
+  const sortedColumns = columns?.sort((a, b) => a.order - b.order) || [];
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -231,7 +225,6 @@ export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
       const jobs =
         column.jobApplications.sort((a, b) => a.order - b.order) || [];
       const jobIndex = jobs.findIndex((j) => j._id === activeId);
-
       if (jobIndex !== -1) {
         draggedJob = jobs[jobIndex];
         sourceColumn = column;
@@ -242,7 +235,7 @@ export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
 
     if (!draggedJob || !sourceColumn) return;
 
-    //Check if dragged in a column or another job
+    // Check if dropped in a column or another job
     const targetColumn = sortedColumns.find((col) => col._id === overId);
     const targetJob = sortedColumns
       .flatMap((col) => col.jobApplications || [])
@@ -306,13 +299,12 @@ export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
       return;
     }
 
-    await moveJobs(activeId, targetColumnId, newOrder);
+    await moveJob(activeId, targetColumnId, newOrder);
   }
 
   const activeJob = sortedColumns
     .flatMap((col) => col.jobApplications || [])
     .find((job) => job._id === activeId);
-
   return (
     <DndContext
       sensors={sensors}
@@ -320,27 +312,33 @@ export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      {" "}
-      <div className="w-full overflow-x-auto">
-        <div className="flex gap-4 overflow-x-auto p-2 pb-4">
-          {columns.map((col, key) => {
+      <div className="space-y-4">
+        <div className="flex gap-4 overflow-x-auto pb-4">
+          {sortedColumns.map((col, key) => {
             const config = COLUMN_CONFIG[key] || {
               color: "bg-gray-500",
               icon: <Calendar className="h-4 w-4" />,
             };
-
             return (
               <DroppableColumn
-                key={String(col._id)}
+                key={key}
                 column={col}
                 config={config}
-                boardId={String(board._id)}
+                boardId={board._id}
                 sortedColumns={sortedColumns}
               />
             );
           })}
         </div>
       </div>
+
+      <DragOverlay>
+        {activeJob ? (
+          <div className="opacity-50">
+            <JobApplicationCard job={activeJob} columns={sortedColumns} />
+          </div>
+        ) : null}
+      </DragOverlay>
     </DndContext>
   );
 }

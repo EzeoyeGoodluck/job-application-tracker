@@ -14,7 +14,7 @@ export function UserBoard(initialBoard?: Board | null) {
     setColumns(initialBoard?.columns ?? []);
   }, [initialBoard]);
 
- async function moveJobs(
+  async function moveJobs(
     jobApplicationId: string,
     newColumnId: string,
     newOrder: number
@@ -26,25 +26,29 @@ export function UserBoard(initialBoard?: Board | null) {
       }));
 
       // Find and remove job from the old column
-
       let jobToMove: JobApplication | null = null;
-      let oldColumnId: string | null = null;
+      let oldColumnIndex = -1;
 
-      for (const col of newColumns) {
+      for (let i = 0; i < newColumns.length; i++) {
+        const col = newColumns[i];
         const jobIndex = col.jobApplications.findIndex(
           (j) => j._id === jobApplicationId
         );
-        if (jobIndex !== -1 && jobIndex !== undefined) {
+        if (jobIndex !== -1) {
           jobToMove = col.jobApplications[jobIndex];
-          oldColumnId = col._id;
-          col.jobApplications = col.jobApplications.filter(
-            (job) => job._id !== jobApplicationId
-          );
+          oldColumnIndex = i;
+          // Create a new array instead of mutating
+          newColumns[i] = {
+            ...col,
+            jobApplications: col.jobApplications.filter(
+              (job) => job._id !== jobApplicationId
+            ),
+          };
           break;
         }
       }
 
-      if (jobToMove && oldColumnId) {
+      if (jobToMove && oldColumnIndex !== -1) {
         const targetColumnIndex = newColumns.findIndex(
           (col) => col._id === newColumnId
         );
@@ -75,12 +79,13 @@ export function UserBoard(initialBoard?: Board | null) {
     });
 
     try {
-      const result = await updateJobApplication(jobApplicationId, {
+      await updateJobApplication(jobApplicationId, {
         columnId: newColumnId,
         order: newOrder,
       });
     } catch (err) {
       console.error("Error", err);
+      // Optional: revert state on error
     }
   }
 
